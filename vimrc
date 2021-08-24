@@ -156,7 +156,8 @@ let g:solarized_termcolors=256
 let g:solarized_termtrans=1
 " let g:hybrid_use_Xresources = 1
 " let g:rehash256 = 1
-colorscheme solarized
+" colorscheme solarized
+colorscheme dracula
 set guifont=Inconsolata:h15
 set guioptions-=L
 
@@ -333,7 +334,7 @@ au BufRead /tmp/mutt-* set textwidth=80
 
 " Go settings
 au BufNewFile,BufRead *.go setlocal noet ts=4 sw=4 sts=4
-" autocmd BufEnter *.go colorscheme nofrils-dark
+"autocmd BufEnter *.go colorscheme nofrils-dark
 
 " scala settings
 autocmd BufNewFile,BufReadPost *.scala setl shiftwidth=2 expandtab
@@ -601,10 +602,21 @@ let g:rust_clip_command = 'xclip -selection clipboard'
 " Run terraform fmt on save.
 let g:terraform_fmt_on_save=1
 
+" =================== vim-terraform ========================
+
+" Prefer to use markdown syntaxes
+let g:vimwiki_list = [{'path': '~/data/vimwiki/', 'syntax': 'markdown', 'ext': '.md'}]
+
+let g:vimwiki_concellevel = 0
+let g:vimwiki_global_ext = 0
+
+au FileType vimwiki setlocal filetype=markdown
+
+
 " =================== coc.nvim ========================
 
 " Give more space for displaying messages.
-set cmdheight=2
+set cmdheight=1
 
 " Having longer updatetime (default is 4000 ms = 4 s) leads to noticeable
 " delays and poor user experience.
@@ -630,5 +642,9 @@ function! s:check_back_space() abort
   let col = col('.') - 1
   return !col || getline('.')[col - 1]  =~# '\s'
 endfunction
+
+" =================== coc.nvim ========================
+" set filetypes as typescriptreact
+autocmd BufNewFile,BufRead *.tsx,*.jsx set filetype=typescriptreact
 
 " vim:ts=2:sw=2:et

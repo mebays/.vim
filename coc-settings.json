@@ -10,5 +10,9 @@
       "filetypes": ["rust"],
       "rootPatterns": ["Cargo.toml"]
     }
+  },
+  "markdownlint": {
+    "onOpen": false,
+    "onChange": false
   }
 }
