@@ -26,6 +26,11 @@ update-plugins: ## Updates all plugins.
 		git checkout release; \
 		git reset --hard origin/release; \
 	fi
+	@if [[ -d "$(CURDIR)/bundle/tabular" ]]; then \
+		cd $(CURDIR)/bundle/tabular; \
+		git checkout colon_align; \
+		git reset --hard origin/colon_align; \
+	fi
 	git submodule foreach 'git pull --recurse-submodules origin `git rev-parse --abbrev-ref HEAD`'
 
 .PHONY: update-pathogen
