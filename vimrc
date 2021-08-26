@@ -449,6 +449,11 @@ nnoremap <leader>gs :Gstatus<CR>
 nnoremap <leader>gp :Gpush<CR>
 vnoremap <leader>gb :Gblame<CR>
 
+" ==================== Sayonara ==================
+nnoremap <leader>q :Sayonara<cr>
+nnoremap <leader>Q :Sayonara!<cr>
+
+
 " =================== Vim-cfmt ===================
 let g:cfmt_style = '-linux'
 "autocmd BufWritePre *.c,*.h Cfmt
