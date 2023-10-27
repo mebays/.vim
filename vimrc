@@ -419,6 +419,9 @@ autocmd BufNewFile,BufRead *.lua setlocal noet ts=4 sw=4 sts=4
 " Dockerfile settings
 autocmd FileType dockerfile set noexpandtab
 
+" Groovy settings
+autocmd FileType groovy syntax sync fromstart
+
 " shell/config/systemd settings
 autocmd FileType fstab,systemd set noexpandtab
 autocmd FileType gitconfig,sh,toml set noexpandtab
@@ -451,7 +454,7 @@ au BufRead,BufNewFile *.mts set ft=typescript
 au BufRead,BufNewFile *.hujson set ft=json
 
 " settings for kcl
-autocmd BufRead,BufNewFile *.kcl set filetype=kcl
+" autocmd BufRead,BufNewFile *.kcl set filetype=kcl
 
 " Binary settings: edit binary using xxd-format
 augroup Binary
@@ -776,7 +779,9 @@ endif
 
 " ==================== vim-go ====================
 let g:go_fmt_fail_silently = 0
-let g:go_fmt_command = "goimports"
+let g:go_def_mode = 'gopls'
+let g:go_info_mode = 'gopls'
+let g:go_gopls_enabled = 1
 let g:go_autodetect_gopath = 1
 let g:go_term_enabled = 1
 let g:go_snippet_engine = "neosnippet"
@@ -786,7 +791,10 @@ let g:go_highlight_trailing_whitespace_error = 0
 let g:go_highlight_extra_types = 0
 let g:go_highlight_operators = 0
 let g:go_highlight_build_constraints = 1
-let g:go_fmt_autosave = 1
+let g:go_fmt_autosave = 0
+let g:go_imports_autosave = 0
+let g:go_imports_mode = "gopls"
+let g:go_metalinter_command = "golangci-lint"
 
 au FileType go nmap <Leader>s <Plug>(go-def-split)
 au FileType go nmap <Leader>v <Plug>(go-def-vertical)
@@ -915,46 +923,6 @@ else
   echo "You might want to install gopls: https://github.com/golang/tools/tree/master/gopls"
 endif
 
-" =================== kcl-lsp ========================
-if executable('kcl-language-server')
-lua << EOF
-local lspconfig = require 'lspconfig'
-local configs = require 'lspconfig.configs'
-
-if not configs.kcl_lsp then
-  configs.kcl_lsp = {
-    default_config = {
-      cmd = {'kcl-language-server', 'server', '--stdio'},
-      filetypes = {'kcl'},
-      root_dir = lspconfig.util.root_pattern('.git'),
-      single_file_support = true,
-    },
-    docs = {
-      description = [=[
-https://github.com/KittyCAD/kcl-lsp
-https://kittycad.io
-
-The KittyCAD Language Server Protocol implementation for the KCL language.
-
-To better detect kcl files, the following can be added:
-
-```
-vim.cmd [[ autocmd BufRead,BufNewFile *.kcl set filetype=kcl ]]
-```
-]=],
-      default_config = {
-        root_dir = [[root_pattern(".git")]],
-      },
-    }
-  }
-end
-
-lspconfig.kcl_lsp.setup{}
-EOF
-else
-  echo "You might want to install kcl-language-server: https://github.com/KittyCAD/kcl-lsp/releases"
-endif
-
 " =================== rust-analyzer ========================
 if executable('rust-analyzer')
 lua << EOF
@@ -989,14 +957,12 @@ else
   echo "You might want to install tsserver: yarn global add typescript typescript-language-server"
 endif
 
-" =================== ocamllsp ========================
-if executable('ocamllsp')
+" =================== groovy ========================
 lua << EOF
-require'lspconfig'.ocamllsp.setup{}
+require'lspconfig'.groovyls.setup{
+  cmd = { "java", "-jar", "/home/matthewb/repos/github.com/GroovyLanguageServer/groovy-language-server/build/libs/groovy-language-server-all.jar" },
+}
 EOF
-else
-  echo "You might want to install ocamllsp: opam install ocaml-lsp-server"
-endif
 
 " =================== nvim-cmp ========================
 
@@ -1049,7 +1015,7 @@ require("cmp_git").setup({
 local capabilities = vim.lsp.protocol.make_client_capabilities()
 capabilities = require('cmp_nvim_lsp').default_capabilities(capabilities)
 -- Enable some language servers with the additional completion capabilities offered by nvim-cmp
-local servers = { 'clangd', 'kcl_lsp', 'ocamllsp', 'rust_analyzer', 'tsserver' }
+local servers = { 'clangd', 'ocamllsp', 'rust_analyzer', 'tsserver' }
 for _, lsp in ipairs(servers) do
   nvim_lsp[lsp].setup {
     -- on_attach = my_custom_on_attach,
@@ -1166,7 +1132,7 @@ require'lspsaga'.setup({
   -- if you don't use nvim-lspconfig you must pass your server name and
   -- the related filetypes into this table
   -- like server_filetype_map = { metals = { "sbt", "scala" } }
-  server_filetype_map = { kcl_lsp = { "kcl" } },
+  -- server_filetype_map = { kcl_lsp = { "kcl" } },
 })
 EOF
 endif
@@ -1339,41 +1305,11 @@ require"octo".setup({
 EOF
 endif
 
-" =================== ocaml ========================
+" =================== ruby ========================
+lua << EOF
+require'lspconfig'.ruby_ls.setup{}
+EOF
 
-if executable('dot-merlin-reader')
-    let s:opam_share_dir = system("opam var share")
-    let s:opam_share_dir = substitute(s:opam_share_dir, '[\r\n]*$', '', '')
-
-    let s:opam_configuration = {}
-
-    function! OpamConfOcpIndent()
-        execute "set rtp^=" . s:opam_share_dir . "/ocp-indent/vim"
-    endfunction
-    let s:opam_configuration['ocp-indent'] = function('OpamConfOcpIndent')
-
-    function! OpamConfOcpIndex()
-        execute "set rtp+=" . s:opam_share_dir . "/ocp-index/vim"
-    endfunction
-    let s:opam_configuration['ocp-index'] = function('OpamConfOcpIndex')
-
-    function! OpamConfMerlin()
-        let l:dir = s:opam_share_dir . "/merlin/vim"
-        execute "set rtp+=" . l:dir
-    endfunction
-    let s:opam_configuration['merlin'] = function('OpamConfMerlin')
-
-    let s:opam_packages = ["ocp-indent", "ocp-index", "merlin"]
-    let s:opam_available_tools = []
-    for tool in s:opam_packages
-      " Respect package order (merlin should be after ocp-index)
-      if isdirectory(s:opam_share_dir . "/" . tool)
-        call add(s:opam_available_tools, tool)
-        call s:opam_configuration[tool]()
-      endif
-    endfor
-else
-  echo "You might want to install merlin: opam install merlin"
-endif
 
 " vim:ts=2:sw=2:et
+

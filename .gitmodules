@@ -148,3 +148,15 @@
 [submodule "bundle/jinja.vim"]
 	path = bundle/jinja.vim
 	url = https://gitlab.com/HiPhish/jinja.vim
+[submodule "bundle/tabular"]
+	path = bundle/tabular
+	url = https://github.com/godlygeek/tabular.git
+[submodule "bundle/vim-wakatime"]
+	path = bundle/vim-wakatime
+	url = https://github.com/wakatime/vim-wakatime.git
+[submodule "bundle/fzf"]
+	path = bundle/fzf
+	url = https://github.com/junegunn/fzf
+[submodule "bundle/vim-easy-align"]
+	path = bundle/vim-easy-align
+	url = https://github.com/junegunn/vim-easy-align
